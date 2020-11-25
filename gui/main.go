@@ -2,7 +2,7 @@ package main
 
 import (
     "log"
-    // "fmt"
+    "fmt"
     "net"
     // "os"
     // "github.com/gotk3/gotk3/glib"
@@ -84,6 +84,24 @@ func createGrid(columnHomogeneous, rowHomogeneous bool, colSpacing, rowSpacing u
     grid.SetColumnSpacing(colSpacing)
     grid.SetRowSpacing(rowSpacing)
     return grid
+}
+
+func createDialog(title string, width, height int) (*gtk.Dialog){
+    dialog, err := gtk.DialogNew()
+    if err != nil {
+        log.Fatal("Unable to add Dialog: ", err)
+    }
+    dialog.SetDefaultSize(width, height)
+    dialog.SetTitle(title)
+    return dialog
+}
+
+func createDialogWithButtons(title string, parent gtk.IWindow, flag gtk.DialogFlags, buttons []interface{}) (*gtk.Dialog){
+    dialog, err := gtk.DialogNewWithButtons(title, parent, flag, buttons)
+    if err != nil {
+        log.Fatal("Unable to create Dialog with Buttons: ", err)
+    }
+    return dialog
 }
 
 func getOutboundIPAddr() (string){
@@ -209,14 +227,69 @@ func addServerSide(win *gtk.Window){
     win.Add(box)
 }
 
+func createRadioButton(grpMember *gtk.RadioButton, label string, callback func()) (*gtk.RadioButton){
+    radio, err := gtk.RadioButtonNewWithLabelFromWidget(grpMember, label)
+    if err != nil {
+        log.Fatal("Unable to generate radio button: ", err)
+    }
+    radio.Connect("toggled", callback)
+    return radio
+}
+
+func setupDialog() (){
+    dialog := createDialog("MPQUIC Experiment", 300, 150)
+
+    dialog.AddButton("OK", gtk.RESPONSE_OK)
+    dialog.AddButton("Cancel", gtk.RESPONSE_CLOSE)
+
+    contentArea, err := dialog.GetContentArea()
+    if err != nil {
+        log.Fatal("Unable to fetch contentArea: ", err)
+    }
+
+    box := createBox(gtk.ORIENTATION_VERTICAL, 0)
+    clientButton := createRadioButton(nil, "Server", func(){
+        role = "server"
+    })
+    serverButton := createRadioButton(clientButton, "Client", func(){
+        role = "client"
+    })
+    box.PackStart(clientButton, false, false, 0)
+    box.PackStart(serverButton, false, false, 0)
+
+
+    contentArea.PackStart(createLabel("Which role do you want to start?", false), false, false, 0)
+    contentArea.PackStart(box, false, false, 0)
+    dialog.ShowAll()
+
+    reply := dialog.Run()
+    if reply == gtk.RESPONSE_OK {
+        fmt.Println("OK")
+    }
+    dialog.Destroy()
+}
+
+var (
+    role = "NULL"
+    win *gtk.Window
+)
+
 func main(){
     gtk.Init(nil)
+    setupDialog()
 
-    win := setUpWindow("Server", 800, 200)
-    addServerSide(win)
-    // win := setUpWindow("Client", 800, 200)
-    // addClientSide(win)
-    win.ShowAll()
+    log.Printf("Selected Role: %s\n", role)
 
-    gtk.Main()
+    if role == "client"{
+        win = setUpWindow("Client", 800, 200)
+        addClientSide(win)
+    } else if role == "server" {
+        win = setUpWindow("Server", 800, 200)
+        addServerSide(win)
+    }
+
+    if role != "NULL" {
+        win.ShowAll()
+        gtk.Main()
+    }
 }
