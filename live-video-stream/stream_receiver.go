@@ -9,6 +9,7 @@ import (
 
 	utils "./utils"
 	quic "github.com/lucas-clemente/quic-go"
+	config "../gui/config"
 )
 
 // This is a mpquic server which receives frames and saves them to jpeg files.
@@ -61,7 +62,7 @@ func main() {
 
 		_, err = io.ReadFull(stream, frame)
 
-		jpeg_file, err := os.Create("/home/pranjal/Downloads/multipath-quic-experiments/live-video-stream/sample/img" + strconv.Itoa(frame_counter) + ".jpg")
+		jpeg_file, err := os.Create(config.VIDEO_DIR + "/img" + strconv.Itoa(frame_counter) + ".jpg")
 		utils.HandleError(err)
 		frame_counter += 1
 
