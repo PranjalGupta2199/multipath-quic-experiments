@@ -19,7 +19,7 @@ import (
 
 // config
 const tcpServerAddr = "localhost:8002"
-const quicServerAddr = "192.168.31.53:4242"
+const quicServerAddr = "192.168.43.148:4242"
 
 func main() {
 

@@ -15,7 +15,7 @@ current_time = time.time()
 def grab_frame():
     global frame_counter
 
-    file = pathlib.Path('sample/img' + str(counter) + '.jpg')
+    file = pathlib.Path('sample/img' + str(frame_counter) + '.jpg')
 
     missing_frame_counter = 0
     while (not file.exists() and missing_frame_counter <= 100):
@@ -25,7 +25,7 @@ def grab_frame():
         time.sleep(TIMEOUT)
         missing_frame_counter += 1
 
-    image = img.imread('sample/img' + str(counter) + '.jpg')
+    image = img.imread('sample/img' + str(frame_counter) + '.jpg')
     frame_counter += 1
 
     current_time = time.time()

@@ -28,7 +28,7 @@ start_time = time.time()
 with picamera.PiCamera() as camera:
 
     # camera resolution
-    camera.resolution = (300, 300)
+    camera.resolution = (400, 400)
     
     # creating a byte stream to store image
     stream = io.BytesIO()

@@ -55,13 +55,13 @@ func main() {
 			break
 		}
 
-		println("frame size: ", size)
+		fmt.Println("frame size: ", size)
 
 		frame := make([]byte, size)
 
 		_, err = io.ReadFull(stream, frame)
 
-		jpeg_file, err := os.Create("sample/img" + strconv.Itoa(frame_counter) + ".jpg")
+		jpeg_file, err := os.Create("/home/pranjal/Downloads/multipath-quic-experiments/live-video-stream/sample/img" + strconv.Itoa(frame_counter) + ".jpg")
 		utils.HandleError(err)
 		frame_counter += 1
 

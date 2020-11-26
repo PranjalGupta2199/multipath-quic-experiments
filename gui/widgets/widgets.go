@@ -111,3 +111,19 @@ func RadioButtonNew(grpMember *gtk.RadioButton, label string, callback func()) (
     radio.Connect("toggled", callback)
     return radio
 }
+
+func ImageNew() (*gtk.Image){
+    img, err := gtk.ImageNew()
+    if err != nil {
+        log.Fatal("Unable to create Image: ", err)
+    }
+    return img
+}
+
+func ImageNewFromFile(path string) (*gtk.Image){
+    img, err := gtk.ImageNewFromFile(path)
+    if err != nil {
+        log.Fatal("Unable to load Image: ", err)
+    }
+    return img
+}
