@@ -8,10 +8,12 @@ import (
     "fmt"
 
     "github.com/gotk3/gotk3/gtk"
+
+    config "../config"
 )
 
-func ReceiverRoutine (quit chan bool, button gtk.IWidget){
-    c := exec.Command("go", "run", "../file-transfer/server-multipath.go")
+func ReceiverRoutine (quit chan bool, button gtk.IWidget, path string){
+    c := exec.Command("go", "run", config.FILE_SERVER_GO, path)
     c.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
     var out bytes.Buffer

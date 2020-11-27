@@ -6,9 +6,9 @@ import (
 
     "github.com/gotk3/gotk3/gtk"
     
-    config "./config"
+    // config "./config"
     file_transfer "./file_transfer"
-    utils "./utils"
+    // utils "./utils"
     video_stream "./video_stream"
     widgets "./widgets"
 )
@@ -24,7 +24,7 @@ func addClientSide(win *gtk.Window) {
     stack := widgets.StackNew()
 
     gridFileTransfer := file_transfer.SetupSenderUI(win)
-    gridVideoStream := video_stream.SetupReceiverUI(win)
+    gridVideoStream := video_stream.SetupSenderUI(win)
     stack.AddTitled(gridFileTransfer, "Page1", "File Transfer")
     stack.AddTitled(gridVideoStream, "Page2", "Video Stream")
     stackSwitcher.SetStack(stack)
@@ -42,7 +42,7 @@ func addServerSide(win *gtk.Window){
     stack := widgets.StackNew()
 
     gridFileTransfer := file_transfer.SetupReceiverUI(win)
-    gridVideoStream := video_stream.SetupSenderUI(win)
+    gridVideoStream := video_stream.SetupReceiverUI(win)
     stack.AddTitled(gridFileTransfer, "Page1", "File Transfer")
     stack.AddTitled(gridVideoStream, "Page2", "Video Stream")
     stackSwitcher.SetStack(stack)
@@ -92,10 +92,6 @@ func setupDialog() (){
 
 func main(){
     gtk.Init(nil)
-    
-    if !utils.PathExists(config.VIDEO_DIR){
-        log.Fatal("Video directory doesn't exists")
-    }
 
     setupDialog()
 

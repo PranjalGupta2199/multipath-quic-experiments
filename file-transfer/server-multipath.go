@@ -17,6 +17,9 @@ const addr = "0.0.0.0:" + config.PORT
 
 func main() {
 
+	savePath := os.Args[1]
+	fmt.Println("Saving file to: ", savePath)
+
 	quicConfig := &quic.Config{
 		CreatePaths: true,
 	}
@@ -52,7 +55,7 @@ func main() {
 
 	fmt.Println("file name received: ", fileName)
 
-	newFile, err := os.Create(fileName)
+	newFile, err := os.Create(savePath + "/" + fileName)
 	utils.HandleError(err)
 
 	defer newFile.Close()

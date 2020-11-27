@@ -7,11 +7,13 @@ import (
     "fmt"
 
     "github.com/gotk3/gotk3/gtk"
+
+    config "../config"
 )
 
-func SenderRoutine(path string, button gtk.IWidget) {
+func SenderRoutine(button gtk.IWidget, path string, addr string) {
 	log.Println("File to be sent : ", path)
-    c := exec.Command("go", "run", "../file-transfer/client-multipath.go", path)
+    c := exec.Command("go", "run", config.FILE_CLIENT_GO, path, addr)
     var out bytes.Buffer
     var stderr bytes.Buffer
 

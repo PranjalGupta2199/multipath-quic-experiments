@@ -11,7 +11,7 @@ import (
 
 
 func GeneratorRoutine(quit chan bool){
-    c := exec.Command(config.PYTHON, config.GENERATOR_PY)
+    c := exec.Command(config.PYTHON, config.VID_GENERATOR_PY)
     var out bytes.Buffer
     var stderr bytes.Buffer
     
@@ -27,6 +27,7 @@ func GeneratorRoutine(quit chan bool){
             if err := c.Process.Kill(); err != nil{
                 log.Println("Error occurred while killing stream_generator.py")
             } else {
+                log.Println(out.String())
                 log.Println("Killed stream_generator.py process")
             }
             return
@@ -39,8 +40,8 @@ func GeneratorRoutine(quit chan bool){
     }
 }
 
-func SenderRoutine(quit chan bool){
-    c := exec.Command("go","run", config.SENDER_GO)
+func SenderRoutine(quit chan bool, addr string){
+    c := exec.Command("go","run", config.VID_SENDER_GO, addr)
     var out bytes.Buffer
     var stderr bytes.Buffer
     
@@ -56,6 +57,7 @@ func SenderRoutine(quit chan bool){
             if err := c.Process.Kill(); err != nil{
                 log.Println("Error occurred while killing stream_sender.go")
             } else {
+                log.Println(out.String())
                 log.Println("Killed stream_sender.go process")
             }
             return
@@ -63,7 +65,7 @@ func SenderRoutine(quit chan bool){
             if err != nil {
                 log.Fatal("Error running stream_sender.go")
                 log.Fatal(fmt.Sprint(err) + ": " + stderr.String())
-            } 
+            }
         }
     }
 }

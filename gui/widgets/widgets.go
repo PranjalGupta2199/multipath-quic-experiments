@@ -127,3 +127,26 @@ func ImageNewFromFile(path string) (*gtk.Image){
     }
     return img
 }
+
+func FileChooserDialogNew(parent gtk.IWindow, action gtk.FileChooserAction) (*gtk.FileChooserDialog){
+    title := "Select an item"
+    if action == gtk.FILE_CHOOSER_ACTION_OPEN {
+        title = "Select a file"
+    } else if action == gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER {
+        title = "Select a folder"
+    }
+
+    dialog, err :=  gtk.FileChooserDialogNewWith2Buttons(
+                        title,
+                        parent,
+                        action,
+                        "Cancel",
+                        gtk.RESPONSE_CLOSE,
+                        "Select",
+                        gtk.RESPONSE_OK)
+    if err != nil {
+        log.Fatal("Unable to create File Chooser Dialog Box")
+    }
+    return dialog
+
+}

@@ -10,8 +10,9 @@ import (
     config "../config"
 )
 
-func ReceiverRoutine(quit chan bool){
-    c := exec.Command("go", "run", config.RECEIVER_GO)
+func ReceiverRoutine(quit chan bool, savePath string){
+    log.Println("Save Path: ", savePath)
+    c := exec.Command("go", "run", config.VID_RECEIVER_GO, savePath)
     c.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
     
     var out bytes.Buffer
@@ -32,6 +33,7 @@ func ReceiverRoutine(quit chan bool){
 
             err = c.Wait()
             if err != nil {
+                log.Println(out.String())
                 log.Println(err)
             }
             return
@@ -39,9 +41,7 @@ func ReceiverRoutine(quit chan bool){
             if err != nil {
                 log.Fatal("Error running stream_receiver.go")
                 log.Fatal(fmt.Sprint(err) + ": " + stderr.String())
-            } else {
-                // log.Println(out.String())
-            } 
+            }
         }
     }
 }

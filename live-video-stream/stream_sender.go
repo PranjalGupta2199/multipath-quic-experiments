@@ -19,10 +19,12 @@ import (
 
 // config
 const tcpServerAddr = "localhost:8002"
-const quicServerAddr = "192.168.43.148:4242"
+// const quicServerAddr = "192.168.43.148:4242"
 
 func main() {
 
+	quicServerAddr := os.Args[1] + ":4242"
+	fmt.Println("quic server addr: ", quicServerAddr)
 	// tcp connection
 	tcpAddr, err := net.ResolveTCPAddr("tcp", tcpServerAddr)
 	if err != nil {
