@@ -31,7 +31,9 @@ func ReceiverRoutine(quit chan bool){
             }
 
             err = c.Wait()
-            log.Println(err)
+            if err != nil {
+                log.Println(err)
+            }
             return
         default:
             if err != nil {

@@ -1,16 +1,16 @@
 package main
 
 import (
-	"crypto/tls"
-	"fmt"
-	"os"
-	"strconv"
-	"time"
-	"bufio"
+    "crypto/tls"
+    "fmt"
+    "os"
+    "strconv"
+    "time"
+    //"bufio"
 
-	utils "./utils"
-	config "./config"
-	quic "github.com/lucas-clemente/quic-go"
+    utils "./utils"
+    config "./config"
+    quic "github.com/lucas-clemente/quic-go"
 )
 
 const addr = config.SERVER_ADDR
@@ -20,97 +20,97 @@ const threshold = 5 * 1024  // 5KB
 
 func main() {
 
-	quicConfig := &quic.Config{
-		CreatePaths: true,
-	}
+    quicConfig := &quic.Config{
+        CreatePaths: true,
+    }
 
-	fileToSend := "dummyfile.txt"
+    fileToSend := os.Args[1]
 
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Filename (blank for dummyfile.txt): ")
-	text, _ := reader.ReadString('\n')
+    // reader := bufio.NewReader(os.Stdin)
+    // fmt.Print("Filename (blank for dummyfile.txt): ")
+    // text, _ := reader.ReadString('\n')
 
-	if text != "\n" {
-		fileToSend = text[:len(text) - 1]
-	}
+    // if text != "\n" {
+    //     fileToSend = text[:len(text) - 1]
+    // }
 
-	fmt.Println("Sending File: ", fileToSend)
+    fmt.Println("Sending File: ", fileToSend)
 
 
-	file, err := os.Open("storage-client/" + fileToSend)
-	utils.HandleError(err)
+    file, err := os.Open(fileToSend)
+    utils.HandleError(err)
 
-	fileInfo, err := file.Stat()
-	utils.HandleError(err)
+    fileInfo, err := file.Stat()
+    utils.HandleError(err)
 
-	if fileInfo.Size() <= threshold {
-		quicConfig.CreatePaths = false
-		fmt.Println("File is small, using single path only.")
-	} else {
-		fmt.Println("file is large, using multipath now.")
-	}
-	file.Close()
+    if fileInfo.Size() <= threshold {
+        quicConfig.CreatePaths = false
+        fmt.Println("File is small, using single path only.")
+    } else {
+        fmt.Println("file is large, using multipath now.")
+    }
+    file.Close()
 
-	fmt.Println("Trying to connect to: ", addr)
-	sess, err := quic.DialAddr(addr, &tls.Config{InsecureSkipVerify: true}, quicConfig)
-	utils.HandleError(err)
+    fmt.Println("Trying to connect to: ", addr)
+    sess, err := quic.DialAddr(addr, &tls.Config{InsecureSkipVerify: true}, quicConfig)
+    utils.HandleError(err)
 
-	fmt.Println("session created: ", sess.RemoteAddr())
+    fmt.Println("session created: ", sess.RemoteAddr())
 
-	stream, err := sess.OpenStream()
-	utils.HandleError(err)
+    stream, err := sess.OpenStream()
+    utils.HandleError(err)
 
-	fmt.Println("stream created...")
-	fmt.Println("Client connected")
-	sendFile(stream, fileToSend)
-	time.Sleep(2 * time.Second)
+    fmt.Println("stream created...")
+    fmt.Println("Client connected")
+    sendFile(stream, fileToSend)
+    time.Sleep(2 * time.Second)
 
 }
 
 func sendFile(stream quic.Stream, fileToSend string) {
-	fmt.Println("A client has connected!")
-	defer stream.Close()
+    fmt.Println("A client has connected!")
+    defer stream.Close()
 
-	file, err := os.Open("storage-client/" + fileToSend)
-	utils.HandleError(err)
+    file, err := os.Open(fileToSend)
+    utils.HandleError(err)
 
-	fileInfo, err := file.Stat()
-	utils.HandleError(err)
+    fileInfo, err := file.Stat()
+    utils.HandleError(err)
 
-	fileSize := utils.FillString(strconv.FormatInt(fileInfo.Size(), 10), 10)
-	fileName := utils.FillString(fileInfo.Name(), 64)
+    fileSize := utils.FillString(strconv.FormatInt(fileInfo.Size(), 10), 10)
+    fileName := utils.FillString(fileInfo.Name(), 64)
 
-	fmt.Println("Sending filename and filesize!")
-	stream.Write([]byte(fileSize))
-	stream.Write([]byte(fileName))
+    fmt.Println("Sending filename and filesize!")
+    stream.Write([]byte(fileSize))
+    stream.Write([]byte(fileName))
 
-	sendBuffer := make([]byte, config.BUFFERSIZE)
-	fmt.Println("Start sending file!\n")
+    sendBuffer := make([]byte, config.BUFFERSIZE)
+    fmt.Println("Start sending file!\n")
 
-	var sentBytes int64
-	start := time.Now()
+    var sentBytes int64
+    start := time.Now()
 
-	for {
-		sentSize, err := file.Read(sendBuffer)
-		if err != nil {
-			break
-		}
+    for {
+        sentSize, err := file.Read(sendBuffer)
+        if err != nil {
+            break
+        }
 
-		stream.Write(sendBuffer)
-		if err != nil {
-			break
-		}
+        stream.Write(sendBuffer)
+        if err != nil {
+            break
+        }
 
 
-		sentBytes += int64(sentSize)
-		fmt.Printf("\033[2K\rSent: %d / %d", sentBytes, fileInfo.Size())
-	}
-	elapsed := time.Since(start)
-	fmt.Println("\nTransfer took: ", elapsed)
+        sentBytes += int64(sentSize)
+        fmt.Printf("\033[2K\rSent: %d / %d", sentBytes, fileInfo.Size())
+    }
+    elapsed := time.Since(start)
+    fmt.Println("\nTransfer took: ", elapsed)
 
-	stream.Close()
-	stream.Close()
-	time.Sleep(2 * time.Second)
-	fmt.Println("\n\nFile has been sent, closing stream!")
-	return
+    stream.Close()
+    stream.Close()
+    time.Sleep(2 * time.Second)
+    fmt.Println("\n\nFile has been sent, closing stream!")
+    return
 }
